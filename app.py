@@ -75,6 +75,31 @@ with st.expander("How to use this tool (read this first)", expanded=True):
 # -----------------------------
 # SIDEBAR INPUTS
 # -----------------------------
+@st.cache_data
+def load_data_for_ranges():
+    df = pd.read_csv("Churn_Modelling.csv")
+    # same cleaning as training (just for ranges)
+    df = df.drop(["RowNumber", "CustomerId", "Surname"], axis=1, errors="ignore")
+    return df
+
+df_ranges = load_data_for_ranges()
+
+def col_minmax(col):
+    return float(df_ranges[col].min()), float(df_ranges[col].max())
+
+cs_min, cs_max = col_minmax("CreditScore")
+age_min, age_max = col_minmax("Age")
+ten_min, ten_max = col_minmax("Tenure")
+bal_min, bal_max = col_minmax("Balance")
+sal_min, sal_max = col_minmax("EstimatedSalary")
+
+# NumOfProducts can be treated as integer range
+prod_min = int(df_ranges["NumOfProducts"].min())
+prod_max = int(df_ranges["NumOfProducts"].max())
+
+# -----------------------------
+# SIDEBAR INPUTS (DYNAMIC RANGES)
+# -----------------------------
 st.sidebar.header("Customer Identification")
 customer_id = st.sidebar.text_input("Customer ID", value="15634602")
 surname = st.sidebar.text_input("Surname", value="Hargrave")
@@ -82,20 +107,53 @@ surname = st.sidebar.text_input("Surname", value="Hargrave")
 st.sidebar.divider()
 st.sidebar.header("Customer Profile (Inputs)")
 
-credit_score = st.sidebar.slider("Credit Score", 300, 900, 650)
+credit_score = st.sidebar.slider(
+    "Credit Score",
+    min_value=int(cs_min),
+    max_value=int(cs_max),
+    value=int(min(max(650, cs_min), cs_max))
+)
+
 geography = st.sidebar.selectbox("Geography", ["France", "Germany", "Spain"])
 gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
 
-age = st.sidebar.slider("Age", 18, 100, 35)
-tenure = st.sidebar.slider("Tenure (years with bank)", 0, 10, 5)
+age = st.sidebar.slider(
+    "Age",
+    min_value=int(age_min),
+    max_value=int(age_max),
+    value=int(min(max(35, age_min), age_max))
+)
 
-balance = st.sidebar.number_input("Account Balance", min_value=0.0, value=50000.0, step=1000.0)
-num_products = st.sidebar.selectbox("Number of Products", [1, 2, 3, 4])
+tenure = st.sidebar.slider(
+    "Tenure (years with bank)",
+    min_value=int(ten_min),
+    max_value=int(ten_max),
+    value=int(min(max(5, ten_min), ten_max))
+)
+
+balance = st.sidebar.number_input(
+    "Account Balance",
+    min_value=float(bal_min),
+    max_value=float(bal_max),
+    value=float(min(max(50000.0, bal_min), bal_max)),
+    step=1000.0
+)
+
+num_products = st.sidebar.selectbox(
+    "Number of Products",
+    list(range(prod_min, prod_max + 1))
+)
 
 has_cr_card = st.sidebar.selectbox("Has Credit Card?", ["No", "Yes"])
 is_active_member = st.sidebar.selectbox("Is Active Member?", ["No", "Yes"])
 
-estimated_salary = st.sidebar.number_input("Estimated Salary", min_value=0.0, value=70000.0, step=1000.0)
+estimated_salary = st.sidebar.number_input(
+    "Estimated Salary",
+    min_value=float(sal_min),
+    max_value=float(sal_max),
+    value=float(min(max(70000.0, sal_min), sal_max)),
+    step=1000.0
+)
 
 st.sidebar.divider()
 st.sidebar.header("Decision Settings")
@@ -103,6 +161,7 @@ threshold = st.sidebar.slider("Risk alert threshold", 0.10, 0.90, 0.50, 0.01)
 
 has_cr_card_val = 1 if has_cr_card == "Yes" else 0
 is_active_val = 1 if is_active_member == "Yes" else 0
+
 
 # -----------------------------
 # MAIN LAYOUT
