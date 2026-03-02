@@ -1,46 +1,127 @@
-# Industrial Anomaly Detection (Generator Fuel & Runtime) — Machine Learning Project
+# Bank Customer Churn Prediction Using Machine Learning
 
 ## Project Overview
-This project builds a multi-class anomaly detection system for industrial generator operational data (runtime and fuel-consumption signals). The objective is to detect abnormal patterns and support reliability monitoring and decision-making.
+
+This project develops a machine learning pipeline to predict customer churn in a retail banking context. The objective is to identify customers likely to leave the bank, enabling proactive retention strategies.
 
 ## Problem Statement
-Real-world operational logs typically contain:
-- severe class imbalance (rare anomaly classes)
-- noisy measurements and missing values
-- cluster/site-specific distribution shifts
-- costly false negatives (missed anomalies)
 
-Because of imbalance, accuracy can be misleading; we prioritize metrics that reflect minority-class performance.
+Customer churn significantly impacts revenue in financial institutions. The challenge lies in:
+
+- Class imbalance between churned and non-churned customers  
+- Correlated financial and demographic features  
+- Trade-off between precision and recall  
+- Interpretability of model predictions  
+
+A naive accuracy-based evaluation is insufficient due to imbalance.
+
+---
+
+## Dataset Description
+
+The dataset includes customer-level information such as:
+
+- Credit score  
+- Age  
+- Balance  
+- Estimated salary  
+- Tenure  
+- Number of products  
+- Geography  
+- Gender  
+- Active membership status  
+
+Target variable:
+- `Exited` (1 = churned, 0 = retained)
+
+---
 
 ## Methodology
-1. **Data Preparation**
-   - cleaning, missing-value handling, outlier checks  
-   - feature engineering (usage intensity, fuel-rate proxies, temporal aggregates)
 
-2. **Model Development**
-   - baseline models and a supervised multi-class classifier
-   - imbalance handling using resampling (e.g., SMOTE-ENN where appropriate)
+### 1. Data Preprocessing
+- Handling categorical variables (encoding)
+- Feature scaling where necessary
+- Train-test split
+- Addressing class imbalance
 
-3. **Evaluation**
-   - Macro-F1 (balanced view across classes)
-   - ROC-AUC (multi-class, where applicable)
-   - Recall for minority anomaly classes (reduce missed anomalies)
+### 2. Model Development
+Models explored:
 
-4. **Explainability**
-   - SHAP-based feature attribution to justify anomaly decisions and support stakeholders
+- Logistic Regression  
+- Random Forest  
+- Gradient Boosting  
+- Support Vector Machine  
 
-## Key Outcomes
-- improved detection of minority anomaly classes compared to naive baselines
-- more reliable evaluation using macro-averaged metrics
-- interpretable insights into drivers of anomaly predictions
+Hyperparameter tuning was performed to optimize performance.
 
-## Tech Stack
-Python, Pandas, NumPy, Scikit-learn, Imbalanced-learn, SHAP
+---
 
-## Next Improvements
-- domain adaptation for cluster/site shift
-- stricter label validation and error analysis
-- lightweight deployment pipeline for production monitoring
+## Evaluation Metrics
+
+Due to class imbalance, evaluation focused on:
+
+- **Precision**
+- **Recall**
+- **F1-Score**
+- **ROC-AUC**
+
+Special emphasis was placed on **Recall**, since missing a churned customer (false negative) has higher business cost.
+
+---
+
+## Key Results
+
+- Gradient Boosting achieved the best overall performance.
+- Recall improved compared to baseline logistic regression.
+- ROC-AUC demonstrated strong class separability.
+- Feature importance analysis identified age, balance, and active membership as strong predictors.
+
+---
+
+## Model Interpretation
+
+Feature importance analysis was conducted to understand key churn drivers.
+
+Important factors included:
+
+- Age
+- Account balance
+- Activity status
+- Number of products
+
+Interpretability was considered critical for financial decision-making contexts.
+
+---
+
+## Deployment
+
+The trained pipeline was exported using `joblib` and integrated into a simple Streamlit application for real-time prediction.
+
+---
+
+## Technologies Used
+
+- Python
+- Pandas
+- NumPy
+- Scikit-learn
+- Matplotlib / Seaborn
+- Streamlit
+- Joblib
+
+---
+
+## Future Improvements
+
+- Handling imbalance using SMOTE or cost-sensitive learning
+- SHAP explainability integration
+- Cross-validation for more robust performance estimates
+- Fairness analysis across demographic groups
+
+---
 
 ## Author
-Corneille Niyonkuru — MSc Data Science (AIMS Rwanda), BSc Mechanical Engineering (UR-CST)
+
+Corneille Niyonkuru  
+MSc Mathematical Sciences (Data Science)  
+African Institute for Mathematical Sciences (AIMS Rwanda)  
